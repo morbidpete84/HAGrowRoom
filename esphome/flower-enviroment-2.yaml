@@ -13,13 +13,13 @@ ota:
   password: "386fdc3692fbf3eff8e251469a7bd886"
 
 wifi:
-  ssid: "Senorita poopy butt hole"
-  password: "yasstacoqueen69$$"
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "Flower-Enviroment-2"
-    password: "gx7YVRVWWjOC"
+    password: !secret esphome_fallback_password
 
 captive_portal:
 
