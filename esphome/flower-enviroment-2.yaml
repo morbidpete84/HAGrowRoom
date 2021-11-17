@@ -1,0 +1,73 @@
+esphome:
+  name: flower-enviroment-2
+  platform: ESP8266
+  board: nodemcuv2
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+  password: "386fdc3692fbf3eff8e251469a7bd886"
+
+wifi:
+  ssid: "Senorita poopy butt hole"
+  password: "yasstacoqueen69$$"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Flower-Enviroment-2"
+    password: "gx7YVRVWWjOC"
+
+captive_portal:
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO5
+      mode: INPUT_PULLUP
+    name: "Feed Tank 0%"
+    filters:
+      - delayed_on: 2000ms
+  - platform: gpio
+    pin:
+      number: GPIO4
+      inverted: true
+      mode: INPUT_PULLUP
+    name: "Feed Tank 25%"
+    filters:
+      - delayed_on: 2000ms
+  - platform: gpio
+    pin:
+      number: GPIO10
+      inverted: true
+      mode: INPUT_PULLUP
+    name: "Feed Tank 50%"
+    filters:
+      - delayed_on: 2000ms
+  - platform: gpio
+    pin:
+      number: GPIO9
+      inverted: true
+      mode: INPUT_PULLUP
+    name: "Feed Tank 75%"
+    filters:
+      - delayed_on: 2000ms
+  - platform: gpio
+    pin:
+      number: GPIO14
+      inverted: true
+      mode: INPUT_PULLUP
+    name: "Feed Tank 100%"
+    filters:
+      - delayed_on: 2000ms
+  - platform: gpio
+    pin:
+      number: GPIO12
+      inverted: true
+      mode: INPUT_PULLUP
+    name: "Storage Tank 100%"
+    filters:
+      - delayed_on: 2000ms

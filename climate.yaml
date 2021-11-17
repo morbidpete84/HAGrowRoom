@@ -1,0 +1,61 @@
+  - platform: tasmota_irhvac
+    name: "Flower AC"
+    command_topic: "cmnd/tasmota_DEED62/irhvac"
+    # Pick one of the following:
+    # State is updated when the tasmota device receives an IR signal (includes own transmission and original remote)
+    # useful when a normal remote is in use alongside the tasmota device, may be less reliable than the second option.
+    state_topic: "tele/tasmota_DEED62/RESULT"
+    # State is updated when the tasmota device completes IR transmissionm, should be pretty reliable.
+    #state_topic: "stat/your_tasmota_device/RESULT"
+    # State is updated when the tasmota device completes IR transmissionm, should be pretty reliable.
+    #state_topic: "stat/flowermcu/RESULT"
+    temperature_sensor: sensor.tasmota_si7021_temperature
+    vendor: "MIDEA"
+    min_temp: 62 #optional - default 16 int value
+    max_temp: 86 #optional - default 32 int value
+    target_temp: 75 #optional - default 26 int value
+    initial_operation_mode: "cool" # optional - default "off" string value (one of the "supported_modes")
+    away_temp: 75 #optional - default 24 int value
+    precision: 1 #optional - default 1 int or float value. Can be set to 1, 0.5 or 0.1
+    supported_modes:
+      - "heat"
+      - "cool"
+      - "dry"
+      - "fan_only"
+      - "auto"
+      - "off" #Turns the AC off - Should be in quotes
+      # Some devices have "auto" and "fan_only" switched
+      # If the following two lines are uncommented, "auto" and "fan" shoud be commented out
+      #- auto_fan_only #if remote shows fan but tasmota says auto
+      #- fan_only_auto #if remote shows auto but tasmota says fan
+    supported_fan_speeds:
+      # Some devices say max,but it is high, and auto which is max
+      # If you uncomment the following two, you have to comment high and max
+      # - auto_max #woud become max
+      # - max_high #would become high
+      #- on
+      #- off
+      #- low
+      - "medium"
+      #- "high"
+      #- middle
+      #- focus
+      #- diffuse
+      - "min"
+      - "max"
+      - "auto"
+    supported_swing_list:
+      - "off"
+      - "vertical" #up to down
+      # - horizontal # Left to right
+      # - both
+    default_quiet_mode: "Off" #optional - default "Off" string value
+    default_turbo_mode: "Off" #optional - default "Off" string value
+    default_econo_mode: "Off" #optional - default "Off" string value
+    hvac_model: "-1" #optional - default "1" string value
+    celsius_mode: "Off" #optional - default "On" string value
+    default_light_mode: "Off" #optional - default "Off" string value
+    default_filter_mode: "Off" #optional - default "Off" string value
+    default_clean_mode: "Off" #optional - default "Off" string value
+    default_beep_mode: "Off" #optional - default "Off" string value
+    default_sleep_mode: "-1" #optional - default "-1" string value

@@ -1,0 +1,55 @@
+
+# Configure a default setup of Home Assistant (frontend, api, etc)
+default_config:
+
+# Example configuration.yaml entry
+recorder:
+  auto_purge: true
+  commit_interval: 60
+  purge_keep_days: 365
+  exclude:
+    entities:
+    - sensor.hacs
+    - sensor.last_boot
+    - binary_sensor.rpi_power_status
+    - weather.basement
+    entity_globs:
+    - sensor.weather_*
+    - sensor.disk*
+    - sensor.load*
+    - sensor.memory*
+    - sensor.processor*
+    - sensor.swap*
+http:
+  ssl_certificate: /ssl/fullchain.pem
+  ssl_key: /ssl/privkey.pem
+  server_port: 9000
+
+# Text to speech
+tts:
+  - platform: google_translate
+
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+#heaters and AC
+climate: !include climate.yaml
+
+# Sensors
+sensor: !include sensors.yaml
+
+#homekit
+#homekit: !include homekit.yaml
+
+#cameras
+camera: !include cameras.yaml
+
+#notify
+#notify: !include notify.yaml
+notify:
+  - name: pushover
+    platform: pushover
+    api_key: !secret pushover_api_key
+    user_key: !secret pushover_user_key

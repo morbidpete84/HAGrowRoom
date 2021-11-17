@@ -1,0 +1,12 @@
+  - platform: rest
+    name: discord_webhook
+    method: POST
+    message_param_name: content
+    title_param_name: !secret discord_title_param_name
+    data:
+      username: !secret discord_username
+    resource: !secret discord_webhook_resource
+#  - name: pushover
+#    platform: pushover
+#    api_key: !secret pushover_api_key
+#    user_key: !secret pushover_user_key

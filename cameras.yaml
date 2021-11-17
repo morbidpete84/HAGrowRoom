@@ -1,0 +1,4 @@
+  - platform: generic
+    stream_source: !secret flower_rtsp_stream
+    still_image_url: "http://192.168.1.4:82/image/FLW"
+    name: Flower

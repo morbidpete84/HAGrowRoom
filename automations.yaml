@@ -1,0 +1,1363 @@
+- id: '1628296100405'
+  alias: Flower Day AC Temp
+  description: Sets AC temp using tasmota HVAC based on day temp input helper
+  trigger:
+  - platform: time
+    at: input_datetime.day_start
+  condition: []
+  action:
+  - service: climate.set_temperature
+    target:
+      entity_id: climate.flower_ac
+    data:
+      hvac_mode: cool
+      temperature: '{{ states(''input_number.flower_day_temp'') }}'
+  mode: single
+- id: '1628296129380'
+  alias: Flower Night AC Temp
+  description: Set's AC temp using Tasmota HVAC ir blaster. temp based on input number
+    helper
+  trigger:
+  - platform: time
+    at: input_datetime.night_start
+  condition: []
+  action:
+  - service: climate.set_temperature
+    target:
+      entity_id: climate.flower_ac
+    data:
+      hvac_mode: cool
+      temperature: '{{ states(''input_number.flower_night_temp'') }}'
+  - wait_template: ''
+    timeout: '60'
+    continue_on_timeout: true
+  - service: climate.set_temperature
+    target:
+      entity_id: climate.flower_ac
+    data:
+      hvac_mode: cool
+      temperature: '{{ states(''input_number.flower_night_temp'') }}'
+  mode: single
+- id: '1628297762496'
+  alias: Turn Bulbs Green from 1 turn off after 30
+  description: 'Green bulbs for plant night work. makes sure bulbs are green if they
+    are accidentally set to another color. turns off after 30 mins because I liek
+    to forget to turn them off. '
+  trigger:
+  - platform: device
+    type: turned_on
+    device_id: 21ebf24dc6f2fe3fef122036b99f535b
+    entity_id: light.green_flower_1
+    domain: light
+  condition: []
+  action:
+  - service: light.turn_on
+    target:
+      entity_id:
+      - light.green_flower_1
+      - light.green_flower_2
+    data:
+      color_name: green
+  - wait_template: ''
+    timeout: '1800'
+  - service: light.turn_off
+    target:
+      entity_id:
+      - light.green_flower_1
+      - light.green_flower_2
+  mode: single
+- id: '1628297792338'
+  alias: Turn Bulbs Green from 2
+  description: 'Green bulbs for plant night work. makes sure bulbs are green if they
+    are accidentally set to another color. '
+  trigger:
+  - platform: device
+    type: turned_on
+    device_id: 77db42f67ec1ff765706fee7dfacbc88
+    entity_id: light.green_flower_2
+    domain: light
+  condition: []
+  action:
+  - service: light.turn_on
+    target:
+      entity_id:
+      - light.green_flower_1
+      - light.green_flower_2
+    data:
+      color_name: green
+  mode: single
+- id: '1628726237212'
+  alias: Flower LED Lights On
+  description: Turns on flower grow LED's. Transition time set by sunrise/sunset input
+    number helper
+  trigger:
+  - platform: time
+    at: input_datetime.day_start
+  condition:
+  - condition: time
+    after: input_datetime.day_start
+    before: input_datetime.night_start
+  action:
+  - service: light.turn_on
+    target:
+      entity_id: light.flower_led_s
+    data:
+      brightness_pct: '{{ states(''input_number.flower_led_brightness'')|int }}'
+      transition: '{{ (states(''input_number.sunrise_sunset'') | float) * 60 | float}}'
+  mode: single
+- id: '1628729240095'
+  alias: Flower Day CO2 On
+  description: Turns on CO2 reg Zigbee plug when CO2 is less than but not equall to
+    CO2 day input helper (template sensor yes/no) Automation is turned on and off
+    by day and night cycle automations
+  trigger:
+  - platform: state
+    entity_id: sensor.day_co2_yes_no
+  condition:
+  - condition: time
+    after: input_datetime.day_start
+    before: input_datetime.night_start
+  - condition: state
+    entity_id: sensor.day_co2_yes_no
+    state: 'no'
+    for: '0'
+  action:
+  - service: switch.turn_on
+    target:
+      entity_id: switch.flower_co2_on_off
+  mode: single
+- id: '1628920767954'
+  alias: Flower Day Humidity On
+  description: Turns on dehumidifier switch (esphome environment device) when humidity
+    from DHT22 flower humidity sensor is less than or equal to humidity day input
+    helper (template sensor yes/no) Automation is turned on and off by day and night
+    cycle automations
+  trigger:
+  - platform: state
+    entity_id: sensor.day_humidity_yes_no
+  condition:
+  - condition: time
+    after: input_datetime.day_start
+    before: input_datetime.night_start
+  - condition: state
+    entity_id: sensor.day_humidity_yes_no
+    state: 'yes'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 0
+  action:
+  - service: switch.turn_on
+    target:
+      entity_id: switch.flower_dehumidifier
+  mode: single
+- id: '1628921353734'
+  alias: Flower Night Humidity Off
+  description: Turns off dehumidifier switch (esphome environment device) when humidity
+    from DHT22 flower humidity sensor is greater than or equal to humidity night input
+    helper (template sensor yes/no) Automation is turned on and off by day and night
+    cycle automations
+  trigger:
+  - platform: state
+    entity_id: sensor.night_humidity_yes_no
+  condition:
+  - condition: state
+    entity_id: sensor.night_humidity_yes_no
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 0
+    state: 'yes'
+  action:
+  - service: switch.turn_off
+    target:
+      entity_id: switch.flower_dehumidifier
+  mode: single
+- id: '1628921512432'
+  alias: Flower Night Humidity On
+  description: Turns on dehumidifier switch (esphome environment device) when humidity
+    from DHT22 flower humidity sensor is greater than or equal to humidity night input
+    helper (template sensor yes/no) Automation is turned on and off by day and night
+    cycle automations
+  trigger:
+  - platform: state
+    entity_id: sensor.night_humidity_yes_no
+  condition:
+  - condition: state
+    entity_id: sensor.night_humidity_yes_no
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 0
+    state: 'no'
+  action:
+  - service: switch.turn_on
+    target:
+      entity_id: switch.flower_dehumidifier
+  mode: single
+- id: '1628923315470'
+  alias: Flower Day Humidity Off
+  description: Turns off dehumidifier switch (esphome environment device) when humidity
+    from DHT22 flower humidity sensor is greater than or equal to humidity day input
+    helper (template sensor yes/no) Automation is turned on and off by day and night
+    cycle automations
+  trigger:
+  - platform: state
+    entity_id: sensor.day_humidity_yes_no
+  condition:
+  - condition: time
+    after: input_datetime.day_start
+    before: input_datetime.night_start
+  - condition: state
+    entity_id: sensor.day_humidity_yes_no
+    state: 'no'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 0
+  action:
+  - service: switch.turn_off
+    target:
+      entity_id: switch.flower_dehumidifier
+  mode: single
+- id: '1628969829688'
+  alias: Flower LED Lights Off
+  description: Turns off flower grow LED's. Transition time set by sunrise/sunset
+    input number helper
+  trigger:
+  - platform: time
+    at: input_datetime.night_start
+  condition:
+  - condition: time
+    after: input_datetime.night_start
+    before: input_datetime.day_start
+  action:
+  - service: light.turn_off
+    target:
+      entity_id: light.flower_led_s
+    data:
+      transition: '{{ (states(''input_number.sunrise_sunset'') | float) * 60 | float}}'
+  mode: single
+- id: '1628994554619'
+  alias: Flower Stage Day Cycle Start
+  description: 'Turns off night automations, turns off Dehu, Turns on day automations
+    after 60 seconds. '
+  trigger:
+  - platform: time
+    at: input_datetime.day_start
+  - platform: homeassistant
+    event: start
+  condition:
+  - condition: time
+    after: input_datetime.day_start
+    before: input_datetime.night_start
+  action:
+  - service: automation.turn_off
+    target:
+      entity_id:
+      - automation.flower_night_humidity
+      - automation.flower_night_humidity_2
+  - wait_template: ''
+    continue_on_timeout: true
+    timeout: '10'
+  - service: automation.turn_on
+    target:
+      entity_id:
+      - automation.flower_day_humidity
+      - automation.flower_day_humidity_off
+      - automation.flower_day_co2_on
+      - automation.flower_day_co2_off_2
+  - service: switch.turn_off
+    target:
+      entity_id: switch.flower_dehumidifier
+  mode: single
+- id: '1629378096683'
+  alias: Flower Day CO2 Off
+  description: Turns off CO2 reg Zigbee plug when CO2 is greater than or equal to
+    CO2 day input helper (template sensor yes/no) Automation is turned on and off
+    by day and night cycle automations
+  trigger:
+  - platform: state
+    entity_id: sensor.day_co2_yes_no
+  condition:
+  - condition: time
+    after: input_datetime.day_start
+    before: input_datetime.night_start
+  - condition: state
+    entity_id: sensor.day_co2_yes_no
+    state: 'yes'
+    for: '0'
+  action:
+  - service: switch.turn_off
+    target:
+      entity_id: switch.flower_co2_on_off
+  mode: single
+- id: '1629386385371'
+  alias: Flower Stage Night Cycle Start
+  description: Turns off Day automations, turns off Dehu, Turns on night automations
+    after 60 seconds. Also turns off First feed complete boolean and Co2
+  trigger:
+  - platform: time
+    at: input_datetime.night_start
+  condition:
+  - condition: time
+    after: input_datetime.night_start
+    before: input_datetime.day_start
+  action:
+  - service: automation.turn_off
+    target:
+      entity_id:
+      - automation.flower_day_co2_off_2
+      - automation.flower_day_co2_on
+      - automation.flower_day_humidity
+      - automation.flower_day_humidity_off
+      - automation.full_feed_flush
+  - service: switch.turn_off
+    target:
+      entity_id:
+      - switch.flower_co2_regulator
+  - wait_template: ''
+    continue_on_timeout: true
+    timeout: '10'
+  - service: automation.turn_on
+    target:
+      entity_id:
+      - automation.flower_night_humidity
+      - automation.flower_night_humidity_2
+  - service: input_boolean.turn_off
+    target:
+      entity_id: input_boolean.first_feed_completed
+  mode: single
+- id: '1629648707080'
+  alias: Home Assistant Start
+  description: ''
+  trigger:
+  - platform: homeassistant
+    event: start
+  condition: []
+  action:
+  - service: switch.turn_off
+    target:
+      entity_id:
+      - switch.flower_co2_regulator
+      - switch.flower_dehumidifier
+  mode: single
+- id: '1629831938127'
+  alias: Daily LED Increase 5%
+  description: Increases Flower Lights by 5% at the start of the night stage if light
+    percentage does not match or equal max brightness input set by stage automation
+  trigger:
+  - platform: time
+    at: input_datetime.night_start
+  condition:
+  - condition: state
+    entity_id: sensor.ledbrightnessmatchesmax
+    state: 'no'
+  action:
+  - service: input_number.increment
+    target:
+      entity_id: input_number.flower_led_brightness
+  mode: single
+- id: '1630178793657'
+  alias: CO2 Off before night cycle
+  description: 'Turns CO2 reg off X amount of time before Night Cycle starts. used
+    to prevent huge spike in CO2 during Night Cycle. Calculates mins from input number
+    helper in settings, Must be an easier way to do this but it works. '
+  trigger:
+  - platform: time
+    at: input_datetime.day_start
+  condition: []
+  action:
+  - wait_template: ''
+    timeout: '{{ 43200 - (states(''input_number.co2_hours_off_before_night_cycle'')
+      | int *3600 ) | round(0) }}'
+    continue_on_timeout: true
+  - service: automation.turn_off
+    target:
+      entity_id: automation.flower_day_co2_on
+  - service: switch.turn_off
+    target:
+      entity_id: switch.flower_co2_on_off
+  mode: single
+- id: '1630187308552'
+  alias: Day Critical Flower Alerts
+  description: 'Push bullet alerts for Flower room getting out of line during day
+    cycle. Based heavily on templates in automation. '
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.feed_water_level
+    above: '99'
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+      milliseconds: 0
+  - platform: numeric_state
+    entity_id: sensor.flower_temperature
+    above: '10'
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+      milliseconds: 0
+    value_template: '{{ (states(''sensor.flower_temperature'')| float) - (states(''input_number.flower_day_temp'')
+      | float) }}'
+  - platform: numeric_state
+    entity_id: sensor.flower_temperature
+    above: '10'
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+      milliseconds: 0
+    value_template: '{{ (states(''input_number.flower_day_temp'')| float) - (states(''sensor.flower_temperature'')
+      | float) }}'
+  - platform: numeric_state
+    entity_id: sensor.flower_humidity
+    above: '10'
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+      milliseconds: 0
+    value_template: '{{ (states(''sensor.flower_humidity'')| float) - (states(''input_number.day_humidity'')
+      | float) }}'
+  - platform: numeric_state
+    entity_id: sensor.flower_humidity
+    above: '10'
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+      milliseconds: 0
+    value_template: '{{ (states(''input_number.day_humidity'')| float) - (states(''sensor.flower_humidity'')
+      | float) }}'
+  - platform: numeric_state
+    entity_id: sensor.flower_co2
+    above: '600'
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+      milliseconds: 0
+    value_template: '{{ (states(''sensor.flower_co2'')| float) - (states(''input_number.flower_day_co2'')
+      | float) }}'
+  - platform: numeric_state
+    entity_id: sensor.average_soil_moisture
+    below: '10'
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+      milliseconds: 0
+  condition:
+  - condition: time
+    after: input_datetime.day_start
+    before: input_datetime.night_start
+  action:
+  - service: notify.pushover
+    data:
+      title: 'FLOWER STATUS ALERT:'
+      message: '"Flower Day, Something is wrong, Check these values" {{ ''\n'' -}}
+        "Feed water level" {{(states(''sensor.feed_water_level'')) }} {{ ''\n'' -}}
+        "Storage Water level" {{(states(''sensor.storage_level'')) }} {{ ''\n'' -}}
+        "Humidity" {{(states(''sensor.flower_humidity'')) }}% Should be {{(states(''input_number.flower_night_humidity''))
+        }}% {{ ''\n'' -}} "Temp" {{(states(''sensor.flower_temperature'')) }} Should
+        be {{(states(''input_number.flower_night_temp'')) }}{{ ''\n'' -}} "CO2" {{(states(''sensor.flower_co2''))
+        }}ppm Should be {{(states(''input_number.flower_day_co2'')) }}ppm {{ ''\n''
+        -}} "Lights" {{(states(''sensor.flower_led_current_brightness'')) }}% {{ ''\n''
+        -}}"Soil Moisture" {{(states(''sensor.average_soil_moisture'')) }}%'
+      data:
+        priority: 2
+        timestamp: true
+        expire: 60
+        retry: 60
+  mode: single
+- id: '1631071825911'
+  alias: Flower Increase week count
+  description: Increases flower week count. triggered when day cycle starts with the
+    condition that the current day matches the day flower cycle started (template
+    sensor to compare days)
+  trigger:
+  - platform: time
+    at: input_datetime.day_start
+  condition:
+  - condition: state
+    entity_id: sensor.flower_day_start
+    state: 'yes'
+  action:
+  - service: counter.increment
+    target:
+      entity_id: counter.flower_week
+  mode: single
+- id: '1631072572250'
+  alias: Reset Flower Week Counter
+  description: 'resets flower week  Counter. Not really used right now. old automation. '
+  trigger: []
+  condition: []
+  action:
+  - service: counter.reset
+    target:
+      entity_id:
+      - counter.flower_week
+      - counter.flower_day_counter
+  - service: input_select.set_options
+    target:
+      entity_id: input_select.flower_start_day
+    data:
+      options: '{{states(''sensor.dayoftheweek'')}}
+
+        '
+  mode: single
+- id: '1632272103485'
+  alias: Veg Humidity Off
+  description: 'Turns off dehumidifier switch group (i have 2 humidifiers in veg)
+    (esphome veg environment device) when humidity from DHT22 veg humidity sensor
+    is greater than or equal to humidity veg input helper (template sensor yes/no) '
+  trigger:
+  - platform: state
+    entity_id: sensor.veg_humidity_yes_no
+  condition:
+  - condition: state
+    entity_id: sensor.veg_humidity_yes_no
+    state: 'yes'
+    for: '0'
+  action:
+  - service: homeassistant.turn_off
+    target:
+      entity_id: group.veghumidifiers
+  mode: single
+- id: '1632272187783'
+  alias: Veg Humidity On
+  description: 'Turns on dehumidifier switch group (i have 2 humidifiers in veg) (esphome
+    veg environment device) when humidity from DHT22 veg humidity sensor is greater
+    less or equal to humidity veg input helper (template sensor yes/no) '
+  trigger:
+  - platform: state
+    entity_id: sensor.veg_humidity_yes_no
+  condition:
+  - condition: state
+    entity_id: sensor.veg_humidity_yes_no
+    state: 'no'
+    for: '0'
+  action:
+  - service: homeassistant.turn_on
+    target:
+      entity_id: group.veghumidifiers
+  mode: single
+- id: '1632273632386'
+  alias: Veg Increase week count
+  description: Increases veg week count. triggered when day cycle starts with the
+    condition that the current day matches the day veg cycle started (template sensor
+    to compare days)
+  trigger:
+  - platform: time
+    at: input_datetime.day_start
+  condition:
+  - condition: state
+    entity_id: sensor.veg_day_start
+    state: 'yes'
+  action:
+  - service: counter.increment
+  mode: single
+- id: '1632273673294'
+  alias: Reset Veg Week Counter
+  description: Resets day and week counter for Veg. Sets day start
+  trigger: []
+  condition: []
+  action:
+  - service: counter.reset
+    target:
+      entity_id:
+      - counter.veg_week
+      - counter.veg_day_counter
+  - service: input_select.set_options
+    target:
+      entity_id: input_select.veg_start_day
+    data:
+      options: '{{states(''sensor.dayoftheweek'')}}
+
+        '
+  mode: single
+- id: '1632337639267'
+  alias: Flower Increase day count
+  description: Increases Flower Day counter by 1. triggered when Day cycle starts
+  trigger:
+  - platform: time
+    at: input_datetime.day_start
+  condition: []
+  action:
+  - service: counter.increment
+    target:
+      entity_id:
+      - counter.flower_day_counter
+  mode: single
+- id: '1632337668175'
+  alias: 'Veg Increase day count '
+  description: Increased veg day counter. triggered by flower day input date time
+    helper
+  trigger:
+  - platform: time
+    at: input_datetime.day_start
+  condition: []
+  action:
+  - service: counter.increment
+    target:
+      entity_id:
+      - counter.veg_day_counter
+  mode: single
+- id: '1632417132797'
+  alias: Veg All Lights Off
+  description: Turns all 4 Veg CMH lights off at time specified by veg night input
+    date time helper. turns on white LED light so I can see in veg room
+  trigger:
+  - platform: time
+    at: input_datetime.veg_lights_off
+  condition: []
+  action:
+  - service: switch.turn_off
+    target:
+      entity_id:
+      - switch.veg_cmh_left_front_on_off
+      - switch.veg_cmh_left_rear_on_off
+      - switch.veg_cmh_right_front_on_off
+      - switch.veg_cmh_right_rear_on_off
+  - service: light.turn_on
+    target:
+      entity_id: light.veg_bulb
+    data:
+      brightness_pct: 100
+  mode: single
+- id: '1633970650376'
+  alias: Veg Stage Settings
+  description: 'Sets flower room to settings for veg for the few times I move veg
+    into the flower room and need to keep it in veg for whatever reason. '
+  trigger: []
+  condition: []
+  action:
+  - service: input_number.set_value
+    target:
+      entity_id:
+      - input_number.flower_day_co2
+      - input_number.flower_night_co2
+    data:
+      value: -1000
+  - service: input_number.set_value
+    target:
+      entity_id:
+      - input_number.flower_day_temp
+      - input_number.flower_night_temp
+    data:
+      value: 75
+  - service: input_number.set_value
+    target:
+      entity_id:
+      - input_number.day_humidity
+      - input_number.flower_night_humidity
+    data:
+      value: 80
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.flower_led_brightness
+    data:
+      value: 40
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.sunrise_sunset
+    data:
+      value: 0
+  - service: input_select.set_options
+    target:
+      entity_id: input_select.flower_stage
+    data:
+      options: Veg
+  - service: input_datetime.set_datetime
+    target:
+      entity_id: input_datetime.day_start
+    data:
+      time: '22:00:00'
+  - service: input_datetime.set_datetime
+    target:
+      entity_id:
+      - input_datetime.night_start
+    data:
+      time: '16:00:00'
+  - service: automation.turn_off
+    target:
+      entity_id: automation.discord_alerts
+  - service: automation.turn_on
+    target:
+      entity_id: automation.discord_veg_alerts
+  mode: single
+- id: '1633991931449'
+  alias: Critical Veg Alerts
+  description: 'Push bullet alerts for Veg room getting out of line. Based heavily
+    on templates in automation. '
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.flower_temperature
+    above: '90'
+  - platform: numeric_state
+    entity_id: sensor.vegroom_humidity
+    above: '10'
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+      milliseconds: 0
+    value_template: '{{ (states(''sensor.vegroom_humidity'')| float) - (states(''input_number.veg_humidity'')
+      | float) }}'
+  - platform: numeric_state
+    entity_id: sensor.flower_humidity
+    above: '10'
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+      milliseconds: 0
+    value_template: '{{ (states(''input_number.veg_humidity'')| float) - (states(''sensor.vegroom_humidity'')
+      | float) }}'
+  condition: []
+  action:
+  - service: notify.pushover
+    data:
+      title: 'FLOWER STATUS ALERT:'
+      message: '"Veg, Something is wrong, Check these values" {{ ''\n'' -}} "Humidity"
+        {{(states(''sensor.vegroom_humidity'')) }}% Should be {{(states(''input_number.veg_humidity''))
+        }}% {{ ''\n'' -}} "Temp" {{(states(''sensor.vegroom_am2301_temperature''))
+        }} '
+      data:
+        priority: 2
+        timestamp: true
+        expire: 60
+        retry: 60
+  mode: single
+- id: '1635010963446'
+  alias: Sunrise/sunset turn on at 70%
+  description: Sets sunrise/sunset time to 30 mins if brightness is above 70% as to
+    not stress the pants or hammer my electric panel with 3870 watts of load instantly
+  trigger:
+  - platform: numeric_state
+    entity_id: input_number.flower_led_brightness
+    above: '65'
+  condition: []
+  action:
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.sunrise_sunset
+    data:
+      value: 30
+  mode: single
+- id: '1635011111076'
+  alias: Sunrise/sunset turn off below 70%
+  description: Sets sunrise/sunset light transition time to 0 when lights are below
+    70%. Takes too long for lights to come on (luxx 645's) when using transitions
+    below 70%
+  trigger:
+  - platform: numeric_state
+    entity_id: input_number.flower_led_brightness
+    below: '70'
+  condition: []
+  action:
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.sunrise_sunset
+    data:
+      value: 0
+  mode: single
+- id: '1635696582833'
+  alias: Fill nute Tank
+  description: Fills feed tank from Storage tank. No triggers, manual activation via
+    button on lovelace water tab. Turns off recirculation switch and turns on feed
+    fill switch. can only activate when storage tank reports full and feed storage
+    tank is below 100 as to prevent over filling and to make sure there is water in
+    the storage tank to fill it
+  trigger: []
+  condition:
+  - condition: state
+    entity_id: sensor.storage_water_level
+    state: '100'
+  - condition: numeric_state
+    entity_id: sensor.feed_water_level
+    below: '100'
+  action:
+  - service: switch.turn_on
+    target:
+      entity_id: switch.nutriant_fill
+  - service: switch.turn_off
+    target:
+      entity_id: switch.storage_circulation
+  mode: single
+- id: '1635696685718'
+  alias: Fill nute Tank Stop
+  description: Turns off Feed fill switch and turns recirculation switch back on for
+    storage tank after feed tank reports 100% for 1 min (using a 1/4"id hose so 1
+    min gives me the little bit extra I need to stop the waves from triggering a false
+    75% fill when the float sensor droops)
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.feed_water_level
+    above: '99'
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+      milliseconds: 0
+  condition: []
+  action:
+  - service: switch.turn_off
+    target:
+      entity_id: switch.nutriant_fill
+  - service: switch.turn_on
+    target:
+      entity_id: switch.storage_circulation
+  mode: single
+- id: '1635713766746'
+  alias: Fill Storage Tank
+  description: Turns on 1/4" switch to allow RO filter to fill tank. Only activates
+    when storage tank sensor reports not full
+  trigger: []
+  condition:
+  - condition: state
+    entity_id: sensor.storage_water_level
+    state: Not Full
+  action:
+  - service: switch.turn_on
+    target:
+      entity_id:
+      - switch.ro_supply
+  mode: single
+- id: '1635713828378'
+  alias: Fill Storage Tank Stop
+  description: turns off 1/4" RO switch after storage tank sensor reports 100%
+  trigger:
+  - platform: state
+    entity_id: sensor.storage_water_level
+    from: Not Full
+    to: '100'
+  condition: []
+  action:
+  - service: switch.turn_off
+    target:
+      entity_id: switch.ro_supply
+  mode: single
+- id: '1636055733825'
+  alias: Flower Feed First Runoff
+  description: Runs feed pump for X amount of time. Triggered at time set in first
+    feed input date time helper. Also turns on First feed boolean to let 30% feed
+    automation run after this if pots get too dry (could just have it turn the automation
+    its self on but I don't always want 30% feed automation on personally)
+  trigger:
+  - platform: time
+    at: input_datetime.flower_feed_first_runoff
+  condition:
+  - condition: time
+    after: input_datetime.day_start
+    before: input_datetime.night_start
+  action:
+  - service: switch.turn_on
+    target:
+      entity_id: switch.flowerfeed
+  - delay:
+      hours: 0
+      minutes: 35
+      seconds: 0
+      milliseconds: 0
+  - service: switch.turn_off
+    target:
+      entity_id: switch.flowerfeed
+  - service: input_boolean.turn_on
+    target:
+      entity_id: input_boolean.first_feed_completed
+  mode: single
+- id: '1636056429781'
+  alias: 30% Flower feed
+  description: Feeds for 30 Mins if Average soil moisture is below 30%. Only if First
+    runoff feed has ran (input_boolean.first_feed_completed is on), feed made boolean
+    is on (turned on after feed batch is made, turns off when tank level hits Dry)
+    is after first feed runoff input time date and before flower night start.
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.average_soil_moisture
+    below: '31'
+    for:
+      hours: 0
+      minutes: 5
+      seconds: 0
+      milliseconds: 0
+  condition:
+  - condition: time
+    after: input_datetime.flower_feed_first_runoff
+    before: input_datetime.night_start
+  - condition: state
+    entity_id: input_boolean.first_feed_completed
+    state: 'on'
+  - condition: state
+    entity_id: input_boolean.feed_made
+    state: 'on'
+  action:
+  - service: homeassistant.turn_on
+    target:
+      entity_id: switch.flowerfeed
+  - delay:
+      hours: 0
+      minutes: 30
+      seconds: 0
+      milliseconds: 0
+  - service: homeassistant.turn_off
+    target:
+      entity_id: switch.flowerfeed
+  mode: single
+- id: '1636249631198'
+  alias: Full Feed Flush
+  description: 'Manually triggered. Turns pump and and thats it. For a full pot flush
+    of CalMG to reset soil. used when and if I hit lockout or runoff tests bad. '
+  trigger:
+  - platform: time
+    at: input_datetime.flower_feed_first_runoff
+  condition: []
+  action:
+  - service: switch.turn_on
+    target:
+      entity_id: switch.flowerfeed
+  mode: single
+- id: '1636249750575'
+  alias: Feed Tank Empty Off
+  description: Turns off the Flower Feed pump when Water Level reports Dry (last sensor
+    in tank) as to not burn out the pump motor
+  trigger:
+  - platform: state
+    entity_id: sensor.feed_water_level
+    to: DRY
+  condition: []
+  action:
+  - service: switch.turn_off
+    target:
+      entity_id: switch.flowerfeed
+  - service: input_boolean.turn_off
+    target:
+      entity_id: input_boolean.feed_made
+  mode: single
+- id: '1636658946892'
+  alias: Veg Right Rear Auto On
+  description: 'Turns on Veg Right Rear CMH light based on Veg lights on input date
+    time helper. 1 automation for each light as I don''t use all 4 lights at once. '
+  trigger:
+  - platform: time
+    at: input_datetime.veg_lights_on
+  condition: []
+  action:
+  - service: switch.turn_on
+    target:
+      entity_id:
+      - switch.veg_cmh_right_rear_on_off
+  - service: light.turn_off
+    target:
+      entity_id: light.veg_bulb
+  mode: single
+- id: '1636659169299'
+  alias: Veg Right Front Auto On
+  description: 'Turns on Veg Right Front CMH light based on Veg lights on input date
+    time helper. 1 automation for each light as I don''t use all 4 lights at once. '
+  trigger:
+  - platform: time
+    at: input_datetime.veg_lights_on
+  condition: []
+  action:
+  - service: switch.turn_on
+    target:
+      entity_id:
+      - switch.veg_cmh_right_front_on_off
+  - service: light.turn_off
+    target:
+      entity_id: light.veg_bulb
+  mode: single
+- id: '1636659335781'
+  alias: Veg Left Rear Auto On
+  description: 'Turns on Veg left Rear CMH light based on Veg lights on input date
+    time helper. 1 automation for each light as I don''t use all 4 lights at once. '
+  trigger:
+  - platform: time
+    at: input_datetime.veg_lights_on
+  condition: []
+  action:
+  - service: switch.turn_on
+    target:
+      entity_id: switch.veg_cmh_left_rear_on_off
+  - service: light.turn_off
+    target:
+      entity_id: light.veg_bulb
+  mode: single
+- id: '1636659352737'
+  alias: Veg Left Front Auto On
+  description: 'Turns on Veg left Front CMH light based on Veg lights on input date
+    time helper. 1 automation for each light as I don''t use all 4 lights at once. '
+  trigger:
+  - platform: time
+    at: input_datetime.veg_lights_on
+  condition: []
+  action:
+  - service: switch.turn_on
+    target:
+      entity_id: switch.veg_cmh_left_front_on_off
+  - service: light.turn_off
+    target:
+      entity_id: light.veg_bulb
+  mode: single
+- id: '1636741459306'
+  alias: Flower Stage 1 Start
+  description: Changes input helpers for my personal choice of settings for the first
+    stage of flowering (12/12) Manually run via button on lovelace. resets day and
+    week flower counters to 1 and sets stage display name in lovelace
+  trigger: []
+  condition: []
+  action:
+  - service: automation.turn_on
+    target:
+      entity_id:
+      - automation.night_cycle_start
+      - automation.turn_off_dehu_and_reg_before_next_cycle
+      - automation.discord_alerts
+      - automation.daily_led_increase_5
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.flower_day_co2
+    data:
+      value: 1200
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.flower_day_temp
+    data:
+      value: 83
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.day_humidity
+    data:
+      value: 75
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.flower_led_brightness
+    data:
+      value: 40
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.sunrise_sunset
+    data:
+      value: 10
+  - service: input_number.set_value
+    target:
+      entity_id:
+      - input_number.flower_night_temp
+    data:
+      value: 78
+  - service: input_number.set_value
+    target:
+      entity_id:
+      - input_number.flower_night_humidity
+    data:
+      value: 70
+  - service: input_datetime.set_datetime
+    target:
+      entity_id: input_datetime.day_start
+    data:
+      time: '23:00:00'
+  - service: input_datetime.set_datetime
+    target:
+      entity_id:
+      - input_datetime.night_start
+    data:
+      time: '11:00:00'
+  - service: automation.turn_off
+    target:
+      entity_id: automation.discord_veg_alerts
+  - service: input_select.set_options
+    target:
+      entity_id: input_select.flower_stage
+    data:
+      options: Stage 1
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.flower_led_max_brightness
+    data:
+      value: 80
+  - service: counter.reset
+    target:
+      entity_id:
+      - counter.flower_week
+      - counter.flower_day_counter
+  - service: input_select.set_options
+    target:
+      entity_id: input_select.flower_start_day
+    data:
+      options: '{{states(''sensor.dayoftheweek'')}}
+
+        '
+  mode: single
+- id: '1636741931675'
+  alias: Flower Stage 2 day 22-43
+  description: Changes input helpers for my personal choice of settings for the Second
+    stage of flowering (bulk) (12/12)  Sets stage display name in lovelace. triggered
+    when day counter hits 22
+  trigger:
+  - platform: state
+    entity_id: counter.flower_day_counter
+    to: '22'
+    from: '21'
+  condition: []
+  action:
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.flower_day_co2
+    data:
+      value: 1600
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.flower_day_temp
+    data:
+      value: 80
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.day_humidity
+    data:
+      value: 68
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.sunrise_sunset
+    data:
+      value: 20
+  - service: input_number.set_value
+    target:
+      entity_id:
+      - input_number.flower_night_temp
+    data:
+      value: 74
+  - service: input_number.set_value
+    target:
+      entity_id:
+      - input_number.flower_night_humidity
+    data:
+      value: 60
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.flower_led_max_brightness
+    data:
+      value: 100
+  - service: input_select.set_options
+    target:
+      entity_id: input_select.flower_stage
+    data:
+      options: Stage 2
+  mode: single
+- id: '1636742062313'
+  alias: 'Flower Stage 3 day 44+ '
+  description: Changes input helpers for my personal choice of settings for the 3rd
+    stage of flowering (12/12). Sets stage display name in lovelace. Triggered by
+    day counter reaching 44
+  trigger:
+  - platform: state
+    entity_id: counter.flower_day_counter
+    to: '44'
+    from: '43'
+  condition: []
+  action:
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.flower_day_co2
+    data:
+      value: -1000
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.flower_day_temp
+    data:
+      value: 76
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.day_humidity
+    data:
+      value: 60
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.sunrise_sunset
+    data:
+      value: 10
+  - service: input_number.set_value
+    target:
+      entity_id:
+      - input_number.flower_night_temp
+    data:
+      value: 70
+  - service: input_number.set_value
+    target:
+      entity_id:
+      - input_number.flower_night_humidity
+    data:
+      value: 50
+  - service: input_number.set_value
+    target:
+      entity_id:
+      - input_number.flower_led_brightness
+    data:
+      value: 70
+  - service: input_select.set_options
+    target:
+      entity_id: input_select.flower_stage
+    data:
+      options: Stage 3
+  mode: single
+- id: '1636742149281'
+  alias: Flower Stage 4 Flush
+  description: Changes input helpers for my personal choice of settings for Flushing
+    (12/12) Manually run via button on lovelace. sets stage display name in lovelace
+  trigger: []
+  condition: []
+  action:
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.flower_day_co2
+    data:
+      value: -1000
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.flower_day_temp
+    data:
+      value: 70
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.day_humidity
+    data:
+      value: 55
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.sunrise_sunset
+    data:
+      value: 10
+  - service: input_number.set_value
+    target:
+      entity_id:
+      - input_number.flower_night_temp
+    data:
+      value: 67
+  - service: input_number.set_value
+    target:
+      entity_id:
+      - input_number.flower_night_humidity
+    data:
+      value: 50
+  - service: input_number.set_value
+    target:
+      entity_id:
+      - input_number.flower_led_brightness
+    data:
+      value: 50
+  - service: input_select.set_options
+    target:
+      entity_id: input_select.flower_stage
+    data:
+      options: Flush
+  mode: single
+- id: '1636821899707'
+  alias: Filter Off
+  description: Turns off Zigbee plug for carbon filter fan. Used for z-wave scene
+    switch on separate HA controller. Called via webhook url from second HA controller
+  trigger:
+  - platform: webhook
+    webhook_id: filteroff
+  condition: []
+  action:
+  - service: switch.turn_off
+    target:
+      entity_id: switch.flower_carbon_filter
+  mode: single
+- id: '1636821929908'
+  alias: Filter On
+  description: Turns on Zigbee plug for carbon filter fan. Used for z-wave scene switch
+    on separate HA controller. Called via webhook url from second HA controller
+  trigger:
+  - platform: webhook
+    webhook_id: filteron
+  condition: []
+  action:
+  - service: switch.turn_on
+    target:
+      entity_id: switch.flower_carbon_filter
+  mode: single
+- id: '1637025531405'
+  alias: Night Critical Flower Alerts
+  description: 'Push bullet alerts for Flower room getting out of line during night
+    cycle. Based heavily on templates in automation. '
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.feed_water_level
+    above: '99'
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+      milliseconds: 0
+  - platform: numeric_state
+    entity_id: sensor.flower_temperature
+    above: '10'
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+      milliseconds: 0
+    value_template: '{{ (states(''sensor.flower_temperature'')| float) - (states(''input_number.flower_night_temp'')
+      | float) }}'
+  - platform: numeric_state
+    entity_id: sensor.flower_temperature
+    above: '10'
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+      milliseconds: 0
+    value_template: '{{ (states(''input_number.flower_night_temp'')| float) - (states(''sensor.flower_temperature'')
+      | float) }}'
+  - platform: numeric_state
+    entity_id: sensor.flower_humidity
+    above: '10'
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+      milliseconds: 0
+    value_template: '{{ (states(''sensor.flower_humidity'')| float) - (states(''input_number.flower_night_humidity'')
+      | float) }}'
+  - platform: numeric_state
+    entity_id: sensor.flower_humidity
+    above: '10'
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+      milliseconds: 0
+    value_template: '{{ (states(''input_number.flower_night_humidity'')| float) -
+      (states(''sensor.flower_humidity'') | float) }}'
+  condition:
+  - condition: time
+    after: input_datetime.night_start
+    before: input_datetime.day_start
+  action:
+  - service: notify.pushover
+    data:
+      title: 'FLOWER STATUS ALERT:'
+      message: '"Flower Night, Something is wrong, Check these values" {{ ''\n'' -}}
+        "Feed water level" {{(states(''sensor.feed_water_level'')) }} {{ ''\n'' -}}
+        "Storage Water level" {{(states(''sensor.storage_water_level'')) }} {{ ''\n''
+        -}} "Humidity" {{(states(''sensor.flower_humidity'')) }}% Should be {{(states(''input_number.flower_night_humidity''))
+        }}% {{ ''\n'' -}} "Temp" {{(states(''sensor.flower_temperature'')) }} Should
+        be {{(states(''input_number.flower_night_temp'')) }}{{ ''\n'' -}} "CO2" {{(states(''sensor.flower_co2''))
+        }}ppm {{ ''\n'' -}} "Lights" {{(states(''sensor.flower_led_current_brightness''))
+        }}% {{ ''\n'' -}}"Soil Moisture" {{(states(''sensor.average_soil_moisture''))
+        }}%'
+      data:
+        priority: 2
+        timestamp: true
+        expire: 60
+        retry: 60
+  mode: single

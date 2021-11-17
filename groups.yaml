@@ -1,0 +1,12 @@
+  flowergreenlights:
+    name: "Green Flower Lights"
+    icon: mdi:lightbulb-on
+    entities:
+      - light.green_flower_1
+      - light.green_flower_2
+  veghumidifiers:
+    name: "Veg humidifiers"
+    icon: mdi:fan
+    entities:
+      - switch.veghumifidier
+      - switch.veg_humidifier_2

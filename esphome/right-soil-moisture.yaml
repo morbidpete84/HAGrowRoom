@@ -1,0 +1,76 @@
+esphome:
+  name: right-soil-moisture
+  platform: ESP32
+  board: esp32dev
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+  password: "78ef3c3adfdccdc108d642bd54987681"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Right-Soil-Moisture"
+    password: !secret esphome_fallback_password
+
+captive_portal:
+
+sensor:
+  - platform: adc
+    pin: GPIO36
+    name: "Soil Moisture Right Back"
+    update_interval: 10s
+    unit_of_measurement: "%"
+    attenuation: 11db
+    filters:
+#    - median:
+#        window_size: 3
+#        send_every: 1
+#        send_first_at: 1
+    - calibrate_linear:
+        - 1.53 -> 100.00
+        - 2.64 -> 0.00
+    - lambda: if (x < 1) return 0; else return (x);
+    accuracy_decimals: 0
+
+  - platform: adc
+    pin: GPIO39
+    name: "Soil Moisture Right Middle"
+    update_interval: 10s
+    unit_of_measurement: "%"
+    attenuation: 11db
+    filters:
+#    - median:
+#        window_size: 3
+#        send_every: 1
+#        send_first_at: 1
+    - calibrate_linear:
+        - 1.39 -> 100.00
+        - 2.49 -> 0.00
+    - lambda: if (x < 1) return 0; else return (x);
+    accuracy_decimals: 0
+
+  - platform: adc
+    pin: GPIO34
+    name: "Soil Moisture Right Front"
+    update_interval: 10s
+    unit_of_measurement: "%"
+    attenuation: 11db
+    filters:
+#    - median:
+#        window_size: 3
+#        send_every: 1
+#        send_first_at: 1
+    - calibrate_linear:
+        - 1.26 -> 100.00
+        - 2.16 -> 0.00
+    - lambda: if (x < 1) return 0; else return (x);
+    accuracy_decimals: 0
