@@ -1,0 +1,237 @@
+#. Checks if the current day of the week matches the day Veg was started 
+#. for day and week counter automations
+  - platform: template
+    sensors:
+      veg_day_start:
+        friendly_name: 'Veg Day Start'
+        unique_id: 4AZ6cwX5
+        value_template: >-
+          {% if states('input_select.veg_start_day') == states('sensor.dayoftheweek') %}
+            yes
+          {% else %}
+            no
+          {% endif %}
+
+#. Checks if the current day of the week matches the day Flower started
+#. for day and week counters automations
+  - platform: template
+    sensors:
+      flower_day_start:
+        friendly_name: 'Flower Day Start'
+        unique_id: 2sdqwDCB
+        value_template: >-
+          {% if states('input_select.flower_start_day') == states('sensor.dayoftheweek') %}
+            yes
+          {% else %}
+            no
+          {% endif %}          
+
+#. grabs the current day
+  - platform: template
+    sensors:
+      dayoftheweek:
+        friendly_name: 'Current Day of the Week'
+        unique_id: Cn5kSh93
+        entity_id: sensor.date
+        value_template: "{{ now().strftime('%A') }}"
+
+#. Calcualtes VPD using temp and humidity sensors of Flower Room      
+  - platform: template
+    sensors:
+      vapor_deficit:
+        friendly_name: 'vpd in pascals'
+        unique_id: m2WBoTEm
+        value_template: >-
+          {% set T = ((states('sensor.flower_temperature') | float) - 32) * 5/9 %}
+          {% set RH = states('sensor.flower_humidity')|float %}
+          {% set SVP = 0.61078 * e ** (17.2694 * T / (T + 238.3)) %}
+          {% set VPD = ((100-RH) / 100) * SVP %}
+          {{-VPD | round(2) * 1000 -}}
+        unit_of_measurement: 'Pa'
+
+#. Calculates VPD using temp and humidity sensors of Veg Room        
+  - platform: template
+    sensors:
+      veg_vapor_deficit:
+        friendly_name: 'veg vpd in kilo pascals'
+        unique_id: CqM2zf9c
+        value_template: >-
+          {% set T = ((states('sensor.vegroom_am2301_temperature') | float) - 32) * 5/9 %}
+          {% set RH = states('sensor.vegroom_humidity')|float %}
+          {% set SVP = 0.61078 * e ** (17.2694 * T / (T + 238.3)) %}
+          {% set VPD = ((100-RH) / 100) * SVP %}
+          {{-VPD | round(2) -}}
+        unit_of_measurement: 'kPa'
+
+#. Calculated Leaf VPD using IR temp sensor and Humidity of Flower Room
+#. Not currently using, trying to figure out how to mount sensor for leaf. 
+#  - platform: template
+#    sensors:
+#      leaf_vapor_deficit:
+#        friendly_name: 'lvpd in kilo pascals'
+#        unique_id: Nc4ikwZr
+#        value_template: >-
+#          {% set T = ((states('sensor.flower_leaf_temperature') | float) - 32) * 5/9 %}
+#          {% set RH = states('sensor.flower_humidity')|float %}
+#          {% set SVP = 0.61078 * e ** (17.2694 * T / (T + 238.3)) %}
+#          {% set VPD = ((100-RH) / 100) * SVP %}
+#          {{-VPD | round(2) -}}
+#        unit_of_measurement: 'kPa'
+        
+#. Takes the 0-255 value of flower brightness and turns into 0-100% for bar chart on lovelace
+#. No real purpose besides seeing percentage
+  - platform: template
+    sensors:
+      flower_led_current_brightness:
+        friendly_name: 'Flower LED Current brightness'
+        unique_id: td6RKq6r
+        value_template: >-
+          {{ (state_attr('light.flower_led_s', 'brightness') | int / 255 * 100 ) | round(0) }}
+
+#. Checks to see if Flower Humidity is above or equal to 
+#. Flower Day Humidity setting. yes no used for automations
+#. to turn on or off dehumidifier switch
+  - platform: template
+    sensors:
+      day_humidity_yes_no:
+        friendly_name: 'Day Humidity Yes No'
+        unique_id: YtpoMU37
+        value_template: >-
+          {% if states('sensor.flower_humidity')|float >= states('input_number.day_humidity')|float %}
+            yes
+          {% else %}
+            no
+          {% endif %}
+          
+#. Checks to see if Flower Humidity is less than or equal to 
+#. Flower Night Humidity setting. yes no used for automations
+#. to turn on or off dehumidifier switch
+  - platform: template
+    sensors:
+      night_humidity_yes_no:
+        friendly_name: 'Night Humidity Yes No'
+        unique_id: kPV3j2XY
+        value_template: >-
+          {% if states('sensor.flower_humidity')|float <= states('input_number.flower_night_humidity')|float %}
+            yes
+          {% else %}
+            no
+          {% endif %}
+          
+#. Checks to see if Veg Humidity is greater than or equal to 
+#. Veg Humidity setting. yes no used for automations
+#. to turn on or off humidifier switch/group
+  - platform: template
+    sensors:
+      veg_humidity_yes_no:
+        friendly_name: 'Veg Humidity Yes No'
+        unique_id: qrYZ7ZSs
+        value_template: >-
+          {% if states('sensor.vegroom_humidity')|float >= states('input_number.veg_humidity')|float %}
+            yes
+          {% else %}
+            no
+          {% endif %}
+          
+#. Checks to see if current Flower light brightness setting is above or equal to 
+#. Flower max brightness setting. yes no used for automation
+#. condition to auto increase Flower lights by 5% daily if not matched. 
+#. different flower stages have different light max levels
+  - platform: template
+    sensors:
+      ledbrightnessmatchesmax:
+        friendly_name: 'LED match Max'
+        unique_id: A3TZYRzc
+        value_template: >-
+          {% if states('input_number.flower_led_brightness')|float >= states('input_number.flower_led_max_brightness')|float %}
+            yes
+          {% else %}
+            no
+          {% endif %}
+
+#. Checks to see if Flower CO2 is above or equal to 
+#. Flower Day CO2 setting. yes no used for automations
+#. to turn on or off CO2 regulator
+  - platform: template
+    sensors:
+      day_co2_yes_no:
+        friendly_name: 'Day CO2 Yes No'
+        unique_id: YrFnt6E3
+        value_template: >-
+          {% if states('sensor.flower_co2')|float >= states('input_number.flower_day_co2')|float %}
+            yes
+          {% else %}
+            no
+          {% endif %} 
+          
+#. Used to give percentage level of feed storage tank.
+#. 5 sensors intergrated into 1 for tank levels used in 
+#. feed, fill and stop automations so pump does not run while dry or over fill during
+#. fill automation
+  - platform: template
+    sensors:
+      feed_water_level:
+        friendly_name: "Feed Tank Level"
+        unique_id: gq9VSTKj
+        value_template: >-
+          {% if is_state('binary_sensor.feed_tank_100', 'on') %}
+          100
+          {% elif is_state('binary_sensor.feed_tank_75', 'on') %}
+          75
+          {% elif is_state('binary_sensor.feed_tank_50', 'on') %}
+          50
+          {% elif is_state('binary_sensor.feed_tank_25', 'on') %}
+          25
+          {% elif is_state('binary_sensor.feed_tank_0', 'on') %}
+          0          
+          {% else %}
+          DRY
+          {% endif %}
+        unit_of_measurement: "%"
+
+#. 1 sensor on storage tank. Tank fed by RO and Dehu. only need to know if full. 
+#. used in feed tank automations and conditions
+  - platform: template
+    sensors:
+      storage_water_level:
+        friendly_name: "Storage Tank"
+        unique_id: a5b2tvZN
+        value_template: >-
+          {% if is_state('binary_sensor.storage_tank_100', 'on') %}
+          100
+          {% else %}
+          Not Full
+          {% endif %} 
+
+#. Misc RPI4 BS I never look at but should. maybe I'll add a Lovelace page for system info. 
+  - platform: systemmonitor
+    resources:
+      - type: disk_use_percent
+      - type: disk_use
+      - type: disk_free
+      - type: memory_free
+      - type: memory_use
+      - type: processor_use
+      - type: processor_temperature
+      - type: last_boot
+      - type: load_15m
+      - type: swap_use_percent
+      - type: swap_use
+      - type: swap_free
+
+#. used to calculate Average Soil moisture level of 6 sensors. 1 every other pot
+#. split between 2 ESP32's. Used in 30% feed automations
+  - platform: template
+    sensors:
+      average_soil_moisture:
+        friendly_name: "Flower Average Soil Moisture"
+        unique_id: jCjWnuh8
+        value_template: >-
+          {{ ((float(states('sensor.soil_moisture_right_back')) +
+               float(states('sensor.soil_moisture_right_middle')) +
+               float(states('sensor.soil_moisture_right_front')) + 
+               float(states('sensor.soil_moisture_left_back')) +
+               float(states('sensor.soil_moisture_left_middle')) +
+               float(states('sensor.soil_moisture_left_front'))) / 6) | round(2)
+          }}
+        unit_of_measurement: "%"
