@@ -1,0 +1,38 @@
+{
+    "version": 1,
+    "key": "input_select",
+    "data": {
+        "items": [
+            {
+                "name": "Veg Start Day",
+                "options": [
+                    "Wednesday"
+                ],
+                "id": "veg_start_day"
+            },
+            {
+                "name": "Flower Start Day",
+                "options": [
+                    "Sunday",
+                    "Monday",
+                    "Tuesday",
+                    "Wednesday",
+                    "Thursday",
+                    "Friday",
+                    "Saturday"
+                ],
+                "id": "flower_start_day"
+            },
+            {
+                "name": "Flower Stage",
+                "options": [
+                    "Flower",
+                    "Flush",
+                    "Cut",
+                    "Cure"
+                ],
+                "id": "flower_stage"
+            }
+        ]
+    }
+}

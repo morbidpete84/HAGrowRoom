@@ -1,0 +1,43 @@
+{
+    "version": 1,
+    "key": "input_datetime",
+    "data": {
+        "items": [
+            {
+                "has_time": true,
+                "has_date": false,
+                "name": "Flower Day Start",
+                "icon": "mdi:weather-sunset-up",
+                "id": "day_start"
+            },
+            {
+                "has_time": true,
+                "has_date": false,
+                "name": "Flower Night Start",
+                "icon": "mdi:weather-sunset-down",
+                "id": "night_start"
+            },
+            {
+                "has_time": true,
+                "has_date": false,
+                "name": "Veg Lights On",
+                "id": "veg_lights_on",
+                "icon": "mdi:weather-sunset-up"
+            },
+            {
+                "has_time": true,
+                "has_date": false,
+                "name": "Veg Lights Off",
+                "icon": "mdi:weather-sunset-down",
+                "id": "veg_lights_off"
+            },
+            {
+                "name": "Flower Feed First Runoff",
+                "icon": "mdi:food-steak",
+                "has_time": true,
+                "has_date": false,
+                "id": "flower_feed_first_runnoff"
+            }
+        ]
+    }
+}

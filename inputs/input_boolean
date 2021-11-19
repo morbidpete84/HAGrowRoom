@@ -1,0 +1,18 @@
+{
+    "version": 1,
+    "key": "input_boolean",
+    "data": {
+        "items": [
+            {
+                "name": "First Feed Completed",
+                "icon": "mdi:check-bold",
+                "id": "first_feed_completed"
+            },
+            {
+                "name": "Feed Made",
+                "icon": "mdi:food-steak",
+                "id": "feed_made"
+            }
+        ]
+    }
+}

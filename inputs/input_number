@@ -1,0 +1,138 @@
+{
+    "version": 1,
+    "key": "input_number",
+    "data": {
+        "items": [
+            {
+                "min": 55.0,
+                "max": 100.0,
+                "name": "Flower Day Humidity",
+                "icon": "mdi:water-percent",
+                "unit_of_measurement": "%",
+                "mode": "slider",
+                "step": 1.0,
+                "id": "day_humidity"
+            },
+            {
+                "min": 55.0,
+                "max": 100.0,
+                "name": "Flower Night Humidity",
+                "icon": "mdi:water-percent",
+                "unit_of_measurement": "%",
+                "mode": "slider",
+                "step": 1.0,
+                "id": "flower_night_humidity"
+            },
+            {
+                "min": 62.0,
+                "max": 100.0,
+                "name": "Flower Day Temp",
+                "icon": "mdi:thermometer-lines",
+                "unit_of_measurement": "F\u00b0",
+                "mode": "slider",
+                "step": 1.0,
+                "id": "flower_day_temp"
+            },
+            {
+                "min": 62.0,
+                "max": 100.0,
+                "name": "Flower Night Temp",
+                "icon": "mdi:thermometer-lines",
+                "unit_of_measurement": "F\u00b0",
+                "mode": "slider",
+                "step": 1.0,
+                "id": "flower_night_temp"
+            },
+            {
+                "min": -1000.0,
+                "max": 2000.0,
+                "name": "Flower Day CO2",
+                "icon": "mdi:molecule-co2",
+                "unit_of_measurement": "ppm",
+                "step": 100.0,
+                "mode": "slider",
+                "id": "flower_day_co2"
+            },
+            {
+                "min": -1000.0,
+                "max": 2000.0,
+                "name": "Flower Night CO2",
+                "icon": "mdi:molecule-co2",
+                "step": 100.0,
+                "unit_of_measurement": "ppm",
+                "mode": "slider",
+                "id": "flower_night_co2"
+            },
+            {
+                "min": 0.0,
+                "max": 100.0,
+                "name": "Flower LED Brightness",
+                "icon": "mdi:brightness-percent",
+                "step": 5.0,
+                "unit_of_measurement": "%",
+                "mode": "slider",
+                "id": "flower_led_brightness_2"
+            },
+            {
+                "min": 0.0,
+                "max": 60.0,
+                "name": "Sunrise/Sunset Ramp Time",
+                "icon": "mdi:theme-light-dark",
+                "step": 5.0,
+                "unit_of_measurement": "Minutes",
+                "mode": "slider",
+                "id": "sunrise_sunset"
+            },
+            {
+                "min": 1.0,
+                "max": 168.0,
+                "name": "Graph Range hours",
+                "icon": "mdi:clock",
+                "step": 4.0,
+                "unit_of_measurement": "Hours",
+                "mode": "slider",
+                "id": "graph_range_hours"
+            },
+            {
+                "min": 0.0,
+                "max": 11.0,
+                "name": "CO2 Hours off before night cycle",
+                "icon": "mdi:clock",
+                "unit_of_measurement": "Hours",
+                "step": 1.0,
+                "mode": "slider",
+                "id": "co2_hours_off_before_night_cycle"
+            },
+            {
+                "min": 0.0,
+                "max": 500.0,
+                "name": "CO2 Trigger Range",
+                "icon": "mdi:chart-bell-curve",
+                "step": 50.0,
+                "unit_of_measurement": "ppm",
+                "mode": "slider",
+                "id": "co2_trigger_tange"
+            },
+            {
+                "min": 50.0,
+                "max": 100.0,
+                "name": "Veg Humidity",
+                "icon": "mdi:weather-rainy",
+                "step": 5.0,
+                "unit_of_measurement": "%",
+                "mode": "slider",
+                "id": "veg_humidity"
+            },
+            {
+                "min": 0.0,
+                "max": 100.0,
+                "name": "Flower LED Max Brightness",
+                "step": 5.0,
+                "unit_of_measurement": "%",
+                "mode": "slider",
+                "id": "flower_led_max_brightness",
+                "icon": "mdi:brightness-percent"
+            }
+        ]
+    }
+}

@@ -10,7 +10,7 @@ logger:
 api:
 
 ota:
-  password: "af778b524477d7905a17690b9509d2f0"
+  password: !secret esphome_ota_password
 
 wifi:
   ssid: !secret wifi_ssid
@@ -18,7 +18,7 @@ wifi:
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "veg enviroment"
+    ssid: "Left-Soil-Moisture"
     password: !secret esphome_fallback_password
 
 captive_portal:

@@ -10,8 +10,8 @@ logger:
 api:
 
 ota:
-  password: "78ef3c3adfdccdc108d642bd54987681"
-
+  password: !secret esphome_ota_password
+ 
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
@@ -31,13 +31,13 @@ sensor:
     unit_of_measurement: "%"
     attenuation: 11db
     filters:
-#    - median:
-#        window_size: 3
-#        send_every: 1
-#        send_first_at: 1
+    - median:
+        window_size: 3
+        send_every: 1
+        send_first_at: 1
     - calibrate_linear:
-        - 1.53 -> 100.00
-        - 2.64 -> 0.00
+        - 1.3840 -> 100.00
+        - 2.5350 -> 0.00
     - lambda: if (x < 1) return 0; else return (x);
     accuracy_decimals: 0
 
@@ -48,13 +48,13 @@ sensor:
     unit_of_measurement: "%"
     attenuation: 11db
     filters:
-#    - median:
-#        window_size: 3
-#        send_every: 1
-#        send_first_at: 1
+    - median:
+        window_size: 3
+        send_every: 1
+        send_first_at: 1
     - calibrate_linear:
-        - 1.39 -> 100.00
-        - 2.49 -> 0.00
+        - 1.1630 -> 100.00
+        - 2.2620 -> 0.00
     - lambda: if (x < 1) return 0; else return (x);
     accuracy_decimals: 0
 
@@ -65,12 +65,12 @@ sensor:
     unit_of_measurement: "%"
     attenuation: 11db
     filters:
-#    - median:
-#        window_size: 3
-#        send_every: 1
-#        send_first_at: 1
+    - median:
+        window_size: 3
+        send_every: 1
+        send_first_at: 1
     - calibrate_linear:
-        - 1.26 -> 100.00
-        - 2.16 -> 0.00
+        - 1.1250 -> 100.00
+        - 2.1840 -> 0.00
     - lambda: if (x < 1) return 0; else return (x);
     accuracy_decimals: 0

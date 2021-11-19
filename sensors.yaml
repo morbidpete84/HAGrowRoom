@@ -4,6 +4,7 @@
     sensors:
       veg_day_start:
         friendly_name: 'Veg Day Start'
+        unique_id: 4AZ6cwX5
         value_template: >-
           {% if states('input_select.veg_start_day') == states('sensor.dayoftheweek') %}
             yes
@@ -17,6 +18,7 @@
     sensors:
       flower_day_start:
         friendly_name: 'Flower Day Start'
+        unique_id: 2sdqwDCB
         value_template: >-
           {% if states('input_select.flower_start_day') == states('sensor.dayoftheweek') %}
             yes
@@ -28,6 +30,8 @@
   - platform: template
     sensors:
       dayoftheweek:
+        friendly_name: 'Current Day of the Week'
+        unique_id: Cn5kSh93
         entity_id: sensor.date
         value_template: "{{ now().strftime('%A') }}"
 
@@ -36,6 +40,7 @@
     sensors:
       vapor_deficit:
         friendly_name: 'vpd in pascals'
+        unique_id: m2WBoTEm
         value_template: >-
           {% set T = ((states('sensor.flower_temperature') | float) - 32) * 5/9 %}
           {% set RH = states('sensor.flower_humidity')|float %}
@@ -49,6 +54,7 @@
     sensors:
       veg_vapor_deficit:
         friendly_name: 'veg vpd in kilo pascals'
+        unique_id: CqM2zf9c
         value_template: >-
           {% set T = ((states('sensor.vegroom_am2301_temperature') | float) - 32) * 5/9 %}
           {% set RH = states('sensor.vegroom_humidity')|float %}
@@ -63,6 +69,7 @@
 #    sensors:
 #      leaf_vapor_deficit:
 #        friendly_name: 'lvpd in kilo pascals'
+#        unique_id: Nc4ikwZr
 #        value_template: >-
 #          {% set T = ((states('sensor.flower_leaf_temperature') | float) - 32) * 5/9 %}
 #          {% set RH = states('sensor.flower_humidity')|float %}
@@ -77,6 +84,7 @@
     sensors:
       flower_led_current_brightness:
         friendly_name: 'Flower LED Current brightness'
+        unique_id: td6RKq6r
         value_template: >-
           {{ (state_attr('light.flower_led_s', 'brightness') | int / 255 * 100 ) | round(0) }}
 
@@ -87,6 +95,7 @@
     sensors:
       day_humidity_yes_no:
         friendly_name: 'Day Humidity Yes No'
+        unique_id: YtpoMU37
         value_template: >-
           {% if states('sensor.flower_humidity')|float >= states('input_number.day_humidity')|float %}
             yes
@@ -101,6 +110,7 @@
     sensors:
       night_humidity_yes_no:
         friendly_name: 'Night Humidity Yes No'
+        unique_id: kPV3j2XY
         value_template: >-
           {% if states('sensor.flower_humidity')|float <= states('input_number.flower_night_humidity')|float %}
             yes
@@ -115,6 +125,7 @@
     sensors:
       veg_humidity_yes_no:
         friendly_name: 'Veg Humidity Yes No'
+        unique_id: qrYZ7ZSs
         value_template: >-
           {% if states('sensor.vegroom_humidity')|float >= states('input_number.veg_humidity')|float %}
             yes
@@ -130,6 +141,7 @@
     sensors:
       ledbrightnessmatchesmax:
         friendly_name: 'LED match Max'
+        unique_id: A3TZYRzc
         value_template: >-
           {% if states('input_number.flower_led_brightness')|float >= states('input_number.flower_led_max_brightness')|float %}
             yes
@@ -144,6 +156,7 @@
     sensors:
       day_co2_yes_no:
         friendly_name: 'Day CO2 Yes No'
+        unique_id: YrFnt6E3
         value_template: >-
           {% if states('sensor.flower_co2')|float >= states('input_number.flower_day_co2')|float %}
             yes
@@ -159,6 +172,7 @@
     sensors:
       feed_water_level:
         friendly_name: "Feed Tank Level"
+        unique_id: gq9VSTKj
         value_template: >-
           {% if is_state('binary_sensor.feed_tank_100', 'on') %}
           100
@@ -181,6 +195,7 @@
     sensors:
       storage_water_level:
         friendly_name: "Storage Tank"
+        unique_id: a5b2tvZN
         value_template: >-
           {% if is_state('binary_sensor.storage_tank_100', 'on') %}
           100
@@ -210,6 +225,7 @@
     sensors:
       average_soil_moisture:
         friendly_name: "Flower Average Soil Moisture"
+        unique_id: jCjWnuh8
         value_template: >-
           {{ ((float(states('sensor.soil_moisture_right_back')) +
                float(states('sensor.soil_moisture_right_middle')) +

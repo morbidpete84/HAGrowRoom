@@ -875,7 +875,7 @@
       entity_id: input_boolean.first_feed_completed
   mode: single
 - id: '1636056429781'
-  alias: 30% Flower feed
+  alias: 55% Flower feed
   description: Feeds for 30 Mins if Average soil moisture is below 30%. Only if First
     runoff feed has ran (input_boolean.first_feed_completed is on), feed made boolean
     is on (turned on after feed batch is made, turns off when tank level hits Dry)
@@ -883,12 +883,12 @@
   trigger:
   - platform: numeric_state
     entity_id: sensor.average_soil_moisture
-    below: '31'
     for:
       hours: 0
       minutes: 5
       seconds: 0
       milliseconds: 0
+    below: '56'
   condition:
   - condition: time
     after: input_datetime.flower_feed_first_runoff
